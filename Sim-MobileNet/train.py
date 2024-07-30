@@ -25,7 +25,7 @@ parser.add_argument('--arch', default='MobileNetV2', type=str, choices=model_nam
 parser.add_argument('--ratio', default=0.25, type=float, help='The ratio of APSeDCTConv')
 parser.add_argument('--use_dct', default=(False, False, True), help='whether using apdct or not')
 parser.add_argument('--workers', default=4, type=int, metavar='N', help='number of data loading workers (default: 4)')
-parser.add_argument('--epochs', default=200, type=int, metavar='EP', help='number of total epochs to run')
+parser.add_argument('--epochs', default=100, type=int, metavar='EP', help='number of total epochs to run')
 parser.add_argument('--start_epoch', default=0, type=int, metavar='SE', help='manual epoch number (useful on restarts)')
 parser.add_argument('--warmup', default=True, type=bool, help='whether using warmup or not  (default: True)')
 parser.add_argument('--warmup_epoch', default=5, type=int, metavar='WE', help='use warmup epoch number (default: 5)')
