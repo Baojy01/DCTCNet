@@ -101,7 +101,7 @@ def train_runner(model, mydevice, trainloader, criterion, optimizer, lr_schedule
 
 
 def val_runner(model, mydevice, val_loader):
-    criterion = nn.CrossEntropyLoss().to(mydevice)
+    criterion = nn.CrossEntropyLoss()
     losses = AverageMeter()
     top1 = AverageMeter()
     top5 = AverageMeter()
