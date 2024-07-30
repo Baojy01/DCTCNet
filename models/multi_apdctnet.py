@@ -2,57 +2,24 @@ from torch import nn
 from utils import MultiAPSeDCT
 
 
-# class BasicBlock(nn.Module):
-#     expansion = 1
-#
-#     def __init__(self, in_planes, planes, stride=1, kernel_size: Union[int, Dict[int, int]] = 3, downsample=None, use_dct=False):
-#         super(BasicBlock, self).__init__()
-#
-#         if use_dct:
-#             self.conv1 = nn.Sequential(MultiAPSeDCT2(in_planes, planes, kernel_size=kernel_size),
-#                                        nn.AvgPool2d(kernel_size=2, stride=2) if stride == 2 else nn.Identity(),
-#                                        # SoftPool2d(kernel_size=2, stride=2) if stride == 2 else nn.Identity(),
-#                                        nn.BatchNorm2d(planes),
-#                                        nn.ReLU(inplace=True))
-#
-#             self.conv2 = MultiAPSeDCT2(planes, planes, kernel_size=kernel_size)
-#         else:
-#             self.conv1 = nn.Sequential(nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False),
-#                                        nn.BatchNorm2d(planes),
-#                                        nn.ReLU(inplace=True))
-#
-#             self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
-#
-#         self.bn2 = nn.BatchNorm2d(planes)
-#         self.relu = nn.ReLU(inplace=True)
-#         self.downsample = downsample
-#
-#     def forward(self, x):
-#         residual = x
-#
-#         out = self.conv1(x)
-#         out = self.conv2(out)
-#         out = self.bn2(out)
-#
-#         if self.downsample is not None:
-#             residual = self.downsample(residual)
-#
-#         out += residual
-#         out = self.relu(out)
-#         return out
-
 class BasicBlock(nn.Module):
     expansion = 1
 
-    def __init__(self, in_planes, planes, stride=1, kernel_size=3, downsample=None, use_dct=False):
+    def __init__(self, in_planes, planes, stride=1, kernel_size: Union[int, Dict[int, int]] = 3, downsample=None, use_dct=False):
         super(BasicBlock, self).__init__()
 
-        self.conv1 = nn.Sequential(nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False),
-                                   nn.BatchNorm2d(planes),
-                                   nn.ReLU(inplace=True))
         if use_dct:
+            self.conv1 = nn.Sequential(MultiAPSeDCT(in_planes, planes, kernel_size=kernel_size),
+                                       nn.AvgPool2d(kernel_size=2, stride=2) if stride == 2 else nn.Identity(),
+                                       nn.BatchNorm2d(planes),
+                                       nn.ReLU(inplace=True))
+
             self.conv2 = MultiAPSeDCT(planes, planes, kernel_size=kernel_size)
         else:
+            self.conv1 = nn.Sequential(nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False),
+                                       nn.BatchNorm2d(planes),
+                                       nn.ReLU(inplace=True))
+
             self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
 
         self.bn2 = nn.BatchNorm2d(planes)
@@ -72,6 +39,38 @@ class BasicBlock(nn.Module):
         out += residual
         out = self.relu(out)
         return out
+
+# class BasicBlock(nn.Module):
+#     expansion = 1
+
+#     def __init__(self, in_planes, planes, stride=1, kernel_size=3, downsample=None, use_dct=False):
+#         super(BasicBlock, self).__init__()
+
+#         self.conv1 = nn.Sequential(nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False),
+#                                    nn.BatchNorm2d(planes),
+#                                    nn.ReLU(inplace=True))
+#         if use_dct:
+#             self.conv2 = MultiAPSeDCT(planes, planes, kernel_size=kernel_size)
+#         else:
+#             self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
+
+#         self.bn2 = nn.BatchNorm2d(planes)
+#         self.relu = nn.ReLU(inplace=True)
+#         self.downsample = downsample
+
+#     def forward(self, x):
+#         residual = x
+
+#         out = self.conv1(x)
+#         out = self.conv2(out)
+#         out = self.bn2(out)
+
+#         if self.downsample is not None:
+#             residual = self.downsample(residual)
+
+#         out += residual
+#         out = self.relu(out)
+#         return out
 
 
 class BottleNeck(nn.Module):
