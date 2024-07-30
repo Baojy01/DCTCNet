@@ -77,7 +77,7 @@ def main():
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    criterion = nn.CrossEntropyLoss(label_smoothing=0.1).to(device)
+    criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
     params = [p for p in model.parameters() if p.requires_grad]
     optimizer = optim.SGD(params, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
 
