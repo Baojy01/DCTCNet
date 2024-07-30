@@ -28,7 +28,6 @@ class MyAPSeDCTConv2d(nn.Module):
 
         dd = {'device': x.device, 'dtype': x.dtype}
         G = self.ap_dct(self.channel, self.dct_size, dd)  # C, dct_size, dct_size
-
         Q_quarter = G @ F.relu(self.Se_weight) @ G.transpose(1, 2)  # C, dct_size, dct_size
         Q = self.GetQ(Q_quarter)  # C, 1, kernel_size, kernel_size
         out = F.conv2d(x, Q, bias=self.Bias, padding=self.dct_size - 1, groups=self.channel)  # B, C, H, W
