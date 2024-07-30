@@ -10,15 +10,6 @@ def ConvBNReLU(in_channels, out_channels, kernel_size=3, stride=1, groups=1):
     )
 
 
-def DctConvBNReLU(channels, kernel_size=3, stride=1):
-    return nn.Sequential(
-        MyAPSeDCTConv2d(channels, kernel_size=kernel_size),
-        nn.AvgPool2d(kernel_size=2, stride=2) if stride == 2 else nn.Identity(),
-        # nn.BatchNorm2d(channels),
-        # nn.ReLU6(inplace=True)
-    )
-
-
 def Conv1x1BN(in_channels, out_channels):
     return nn.Sequential(
         nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=1, bias=False),
@@ -64,29 +55,6 @@ class DCTInvertedResidual(nn.Module):
         mid_channels = in_channels * expand_ratio
         self.conv1 = Conv1x1BNReLU(in_channels, mid_channels)
 
-        self.conv2 = DctConvBNReLU(mid_channels, kernel_size, stride)
-
-        self.conv3 = Conv1x1BN(mid_channels, out_channels)
-
-        self.has_skip = (in_channels == out_channels and stride == 1)
-
-    def forward(self, x):
-        out = self.conv1(x)
-        out = self.conv2(out)
-        out = self.conv3(out)
-
-        if self.has_skip:
-            out = out + x
-
-        return out
-
-
-class DCTInvertedResidual2(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size=7, stride=1, expand_ratio=4):
-        super(DCTInvertedResidual2, self).__init__()
-        mid_channels = in_channels * expand_ratio
-        self.conv1 = Conv1x1BNReLU(in_channels, mid_channels)
-
         self.conv2 = nn.Sequential(MultiAPSeDCT(mid_channels, out_channels, kernel_size),
                                    nn.AvgPool2d(kernel_size=2, stride=2) if stride == 2 else nn.Identity(),
                                    nn.BatchNorm2d(out_channels))
@@ -118,14 +86,14 @@ class MobileNetV2(nn.Module):
 
         features = []
         # conv1 layer
-        features.append(ConvBNReLU(3, input_channel, stride=2))  # 添加第一层普通卷积层
+        features.append(ConvBNReLU(3, input_channel, stride=2))
         # building inverted residual  blocks
         for t, c, n, s, dct_used in inverted_residual_setting:
-            block = DCTInvertedResidual2 if dct_used else InvertedResidual
+            block = DCTInvertedResidual if dct_used else InvertedResidual
             output_channel = c
             for i in range(n):
-                # block = DCTInvertedResidual2 if dct_used and i > 0 else InvertedResidual
-                stride = s if i == 0 else 1  # s表示的是倒残差模块结构中第一层卷积对应的stride，剩余层都是1
+                # block = DCTInvertedResidual if dct_used and i > 0 else InvertedResidual
+                stride = s if i == 0 else 1  # s=2 in first layer, others s=1
                 features.append(block(input_channel, output_channel, stride=stride, expand_ratio=t))
                 input_channel = output_channel
         # building last several layers
