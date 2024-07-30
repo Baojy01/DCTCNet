@@ -22,7 +22,6 @@ parser.add_argument('--dataset', default='tiny_imagenet', type=str, choices=['im
 parser.add_argument('--num_classes', default=200, type=int, help='number of classes for classification')
 parser.add_argument('--data_dir', default='', type=str, help='path of dataset')
 parser.add_argument('--arch', default='MobileNetV2', type=str, choices=model_names, metavar='ARCH', help='model architecture')
-parser.add_argument('--ratio', default=0.25, type=float, help='The ratio of APSeDCTConv')
 parser.add_argument('--use_dct', default=(False, False, True), help='whether using apdct or not')
 parser.add_argument('--workers', default=4, type=int, metavar='N', help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=100, type=int, metavar='EP', help='number of total epochs to run')
